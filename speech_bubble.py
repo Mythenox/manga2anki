@@ -2,6 +2,8 @@ import cv2
 from cv2.typing import MatLike
 from matplotlib import pyplot as plt
 
+# TODO: replace opencv with Pillow for free threading support
+
 
 def main():
     file_path = "sample/yfnu7-7.png" 
