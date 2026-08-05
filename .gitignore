@@ -11,3 +11,4 @@ test*
 # generated files
 __pycache__/
 cuda*
+*.apkg
