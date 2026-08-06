@@ -4,18 +4,19 @@ from sudachipy import tokenizer, dictionary
 from word import Word, to_hiragana
 from constants import HIRAGANA, KATAKANA, KATAKANA_TO_HIRAGANA, KANJI
 from infer import infer_reading
+import asyncio
 
 # filter out vocab with jlpt_rating < jlpt_filter if "n{i}" passed from command line, where i in {1,2,3,4}
 
 class Tango:
     def __init__(
             self,
-            word: str,
+            surface: str,
             reading: str | None,
             excerpt: str,
             part_of_speech: str
     ) -> None:
-        self.word = word
+        self.surface = surface
         self.reading = reading
         self.excerpt = excerpt
         self.part_of_speech = part_of_speech
@@ -23,7 +24,7 @@ class Tango:
     @cached_property
     def jisho_html(self) -> str | None:
         try:
-            html = fetch_word_html(f"https://jisho.org/search/{self.word}")
+            html = fetch_word_html(f"https://jisho.org/search/{self.surface}")
         except Exception:
             return None
         return html 
@@ -41,7 +42,7 @@ class Tango:
         return get_tango_jlpt_rating(self.jisho_html)
     
     def __repr__(self) -> str:
-        return "{" + f"word={self.word}, reading={self.reading}, type={self.part_of_speech}, JLPT N{self.jlpt_rating}" + "}"
+        return "{" + f"word={self.surface}, reading={self.reading}, type={self.part_of_speech}, JLPT N{self.jlpt_rating}" + "}"
     
     
 class Kanji:

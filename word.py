@@ -1,9 +1,7 @@
 # TODO: add support for slang terms? (words like ムズい aren't properly parsed)
-# TODO: use parts of speech to add appropriate tags for anki (na-adjective, i-adjective, etc)
 
 #TODO: Fix deinflect and use it
 #      Store words in deinflected form (probably use @cached_property?)
-#TODO: from process_page import get_bubble_text <-- this import slows down the program significantly, even if the function isn't used. ????
 
 from typing import Union, Optional, List, Literal, Tuple
 from sudachipy import tokenizer, dictionary, Morpheme, SplitMode, MorphemeList
@@ -86,20 +84,24 @@ class Word:
     @property
     def deinflected_reading_form(self) -> str:
         # only types being passed to this method are verbs and i-adjectives
-        kana_reading = self.reading_form
-        uninflected_part: str = kana_reading
+        dictionary_form_endings: list[str] = ["う", "く", "す", "つ", "ぬ", "む", "る"]
+        if self.reading_form[-1] in dictionary_form_endings:
+            return self.reading_form # in this case, the word must already be in dictionary form
+        uninflected_part: str = self.reading_form
         if self.eng_POS == "verb":
+            if self.dictionary_form in ["する", "くる"]:
+                return self.dictionary_form 
             if (
                 "未然形" in self.part_of_speech[-1] or
                 ("連用形" in self.part_of_speech[-1] and "五段" in self.part_of_speech[-2])
-            ) :
+            ):
                 # form will be ~[か,ら,た,さ,ま,わ,な] or ~[き,り,ち,し,み,い,に]
-                uninflected_part = kana_reading[:-1]
+                uninflected_part = self.reading_form[:-1]
                 return uninflected_part + self.dictionary_form[-1]
 
-            for i in range(len(kana_reading)):
-                if kana_reading[i] == "っ":
-                    uninflected_part = kana_reading[:i]
+            for i in range(len(self.reading_form)):
+                if self.reading_form[i] == "っ":
+                    uninflected_part = self.reading_form[:i]
 
             for i in range(len(self.surface)):
                 if self.surface[i] != self.dictionary_form[i]:
@@ -109,10 +111,10 @@ class Word:
         elif self.eng_POS == "i-adjective":
             if self.part_of_speech[-1] == "連用形-促音便":
                 # form will be ~かっ
-                uninflected_part: str = kana_reading[:-2]
+                uninflected_part: str = self.reading_form[:-2]
             elif self.part_of_speech[-1] == "連用形-一般":
                 # form will be ~く
-                uninflected_part: str = kana_reading[:-1]
+                uninflected_part: str = self.reading_form[:-1]
             return uninflected_part + "い"
         return self.reading_form
             

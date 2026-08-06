@@ -3,7 +3,9 @@ from urllib.parse import urljoin
 import requests
 
 #TODO: Coroutines
-   
+"""TODO: instead of fetching the first result, make sure the text (maybe normalized form?) appears in the result,
+and that the part of speech matches (solves the problem of どう (adverb) being matched to 銅 (copper))
+"""   
 
 def main():
     pass
