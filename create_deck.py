@@ -1,5 +1,5 @@
 from genanki import Deck, Note
-from default_models import *
+from default_note_models import *
 from create_vocab import Tango, Kanji
 import random
 
@@ -28,7 +28,7 @@ def add_note(deck: Deck, entry: Tango | Kanji):
         note = Note(
             model=DEFAULT_MODEL_VOCAB,
             fields=[
-                entry.word,
+                entry.surface,
                 entry.reading,
                 entry.eng_meaning,
                 entry.excerpt,
