@@ -11,6 +11,7 @@ class Tango:
             morpheme: Morpheme,
             part_of_speech: str
     ) -> None:
+        self.morpheme = morpheme
         self.surface = morpheme.lemma
         self.excerpt = morpheme.phrase.text
         self.part_of_speech = part_of_speech
