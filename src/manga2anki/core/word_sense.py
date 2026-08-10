@@ -4,7 +4,7 @@ from rhoknp import Morpheme
 from jamdict import Jamdict
 import torch
 from typing import TypedDict
-from inflect import lemmatize_surface
+from manga2anki.util.inflect import lemmatize_surface
 from dataclasses import dataclass
 
 @dataclass

@@ -1,10 +1,7 @@
 import asyncio
-import aiohttp
-from sudachipy import tokenizer, dictionary
-from word import Word
-from create_vocab import Tango, Kanji, create_vocab
+from manga2anki.core.vocab import Tango, Kanji
 from genanki import Deck, Note
-from create_deck import add_note, create_deck
+from manga2anki.core.generate_deck import GeneratedDeck
 
 class AsyncVocabProcessor:
     def __init__(self, max_concurrency, words: list[Word]) -> None:

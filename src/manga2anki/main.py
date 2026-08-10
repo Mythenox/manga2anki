@@ -4,41 +4,32 @@ Add option to ask for user confirmation, where declined words will be remembered
 and ignored in the future. If supplied with a parent deck, words present in the parent
 deck will be ignored to avoid redundancy."""
 
-#TODO: use coroutines?
-
-import cv2
-from sudachipy import tokenizer
-from word import tokenize
-from create_vocab import create_vocab
-from process_page import get_bubble_text
+from manga2anki.util.process_page import get_bubble_text
 from genanki import Package
-from create_deck import *
-# from process_page import get_bubble_text
+from manga2anki.core.generate_deck import GeneratedDeck
+from rhoknp import KNP
+from manga2anki.core.batch_create import batch_create_tango, batch_create_kanji
 
 def main():
+    knp = KNP()
     # text = "そもそもどうしてそんな結論になったの？"
     # text = "自分で持続ですか？って聞いてたから大丈夫だと思うけど"
     images = [f"sample/yfnu7-7({i}).png" for i in range(13)]
     text_list: list[str] = get_bubble_text(images)
+
+    all_morphemes = []
+    for dialogue in text_list:
+        sentence = knp.apply_to_sentence(dialogue)
+        all_morphemes.extend(sentence.morphemes)
     
     # text_list = ["そこには、おぞましい光景が広がっていた"]
-    tokens = set()
-    mode = tokenizer.Tokenizer.SplitMode.C
-    for dialogue in text_list:
-        dialogue_tokens = tokenize(dialogue, mode)
-        tokens.update(dialogue_tokens)
     # tokens = tokenize_text(text)
-    deck = create_deck()
-    for token in tokens:
-        vocab = create_vocab(token, kanji_mode=False)
-        if vocab:
-            if isinstance(vocab, Tango):
-                add_note(deck, vocab)
-            else:
-                for character in vocab:
-                    add_note(deck, character)
+    generated_deck = GeneratedDeck()
+    kanji_list = batch_create_kanji(all_morphemes)
+    for kanji in kanji_list:
+        generated_deck.add_kanji_note(kanji)
     print("Generating .apkg...")
-    Package(deck).write_to_file("output.apkg")
+    Package(generated_deck.deck).write_to_file("output.apkg")
     
 
 if __name__ == "__main__":

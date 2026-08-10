@@ -3,7 +3,7 @@ from cv2.typing import MatLike
 from manga_ocr import MangaOcr
 import PIL
 from PIL import Image
-from speech_bubble import find_bubbles, preprocess
+from manga2anki.util.speech_bubble import find_bubbles, preprocess
 
 #TODO: use multiprocessing?
 
