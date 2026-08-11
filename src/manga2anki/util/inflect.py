@@ -47,7 +47,13 @@ def lemmatize_reading_i_adj(morpheme: Morpheme) -> str:
         uninflected_part: str = morpheme.reading[:-1]
     return uninflected_part + "い"
 
-def lemmatize_reading_verb(morpheme: Morpheme) -> str:
+def lemmatize_reading_verb(morpheme: Morpheme) -> str: 
+    # bugged for 聞いて? 
+    # also 学ぶ? 
+    # どうかした→どうかしたする?? 
+    # 出せる->だせる?? 
+    # 走れる -> はしれる?
+    # そそのかしてんの -> そそのかしてす?
     """Returns reading of lemmatized form of verb.
     Example: 刺さった -> ささる"""
     uninflected_part: str = morpheme.reading
@@ -99,6 +105,6 @@ def eng_pos(morpheme: Morpheme) -> str:
         case "副詞":
             return "adverb"
         case "連体詞":
-            return "adnominal adjective"
+            return "adnominal-adjective"
         case _:
             return "conjunction"

@@ -12,3 +12,5 @@ README.md
 __pycache__/
 cuda*
 *.apkg
+*.png
+*.log

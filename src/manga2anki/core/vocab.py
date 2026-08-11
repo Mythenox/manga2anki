@@ -12,10 +12,23 @@ class Tango:
     ) -> None:
         self.surface = lemmatize_surface(parent_morpheme)
         self.reading = lemmatize_reading(parent_morpheme)
-        self.excerpt = parent_morpheme.clause.text
         self.part_of_speech = part_of_speech
         self.eng_meaning = eng_meaning
         self.jlpt_level = jlpt_level
+
+        try:
+            self.excerpt = parent_morpheme.sentence.text
+        except AttributeError:
+            self.excerpt = "NULL"
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, Tango):
+            return False
+        return (
+            self.surface == other.surface and
+            self.reading == other.reading and
+            self.part_of_speech == other.part_of_speech
+        ) 
     
     def __repr__(self) -> str:
         return "{" + f"word={self.surface}, reading={self.reading}, type={self.part_of_speech}, JLPT N{self.jlpt_level}" + "}"
@@ -37,9 +50,16 @@ class Kanji:
         self.jlpt_level = jlpt_level
         self.context_surface = lemmatize_surface(parent_morpheme)
         self.context_reading = lemmatize_reading(parent_morpheme)
-        self.excerpt = parent_morpheme.clause.text
         self.index = index
         self.inferred_reading = self.infer_reading()
+
+        try:
+            self.excerpt = parent_morpheme.clause.text
+        except AttributeError:
+            try:
+                self.excerpt = parent_morpheme.sentence.text
+            except AttributeError:
+                self.excerpt = "NULL"
 
     # what to do in the case of words like 日々?
     

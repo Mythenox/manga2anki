@@ -36,3 +36,5 @@ KANJI: set[str] = {
     chr(code)
     for code in range(0x4E00, 0x9FFF)
 }
+
+JA_SYMBOLS: set[str] = HIRAGANA | KATAKANA | KANJI
