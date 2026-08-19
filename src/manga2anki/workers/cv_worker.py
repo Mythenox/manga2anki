@@ -12,7 +12,7 @@ import time
 # This is currently the bottleneck
 
 def run_cv_worker(image_paths_chunk: list[str], output_queue: Queue, log_queue: Queue):
-    cv2.setNumThreads(1)
+    # cv2.setNumThreads(1)
     signal.signal(signal.SIGINT, signal.SIG_IGN)
 
     configure_worker_logging(log_queue)

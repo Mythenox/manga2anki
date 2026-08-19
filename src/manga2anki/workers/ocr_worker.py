@@ -7,7 +7,6 @@ import logging
 from manga2anki.util.logger import configure_worker_logging
 
 def run_ocr_worker(input_queue: Queue, output_queue: Queue, log_queue: Queue, device: str):
-
     signal.signal(signal.SIGINT, signal.SIG_IGN)
 
     configure_worker_logging(log_queue)

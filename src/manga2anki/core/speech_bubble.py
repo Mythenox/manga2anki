@@ -1,6 +1,8 @@
 import cv2
 from cv2.typing import MatLike
 
+# TODO: move preprocessing to GPU?
+
 def get_bubbles(
         image: MatLike,
         simple_method: bool = True,

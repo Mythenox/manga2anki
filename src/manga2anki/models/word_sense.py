@@ -1,3 +1,4 @@
+import transformers
 from transformers import AutoTokenizer, AutoModel
 from sentence_transformers import SentenceTransformer, util
 from rhoknp import Morpheme
@@ -6,6 +7,8 @@ import torch
 from typing import TypedDict
 from manga2anki.util.inflect import lemmatize_surface, lemmatize_reading
 from dataclasses import dataclass
+
+transformers.logging.disable_progress_bar()
 
 @dataclass
 class MorphemeDatum:

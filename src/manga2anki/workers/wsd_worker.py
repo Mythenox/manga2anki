@@ -60,6 +60,7 @@ def run_wsd_worker(input_queue: Queue, log_queue: Queue, device: str, deck_name:
 
         except queue.Empty:
             if len(batch_accumulator) > 0:
+                logging.info(f"Slow. Only received {len(batch_accumulator)} items in {timeout_seconds:.1f}s.")
                 morphemes = [
                     morpheme 
                     for text in batch_accumulator
