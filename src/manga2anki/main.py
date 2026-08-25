@@ -7,6 +7,7 @@ deck will be ignored to avoid redundancy."""
 # TODO: add support for epub and mobi file types?
 # TODO: add support for only allowing JLPT vocab/kanji
 # TODO: add strict flag to not add vocab that do not have a jmdict definition
+# TODO: add  wanikani levels as well
 
 import time
 import torch.multiprocessing as mp
