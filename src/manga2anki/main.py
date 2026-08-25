@@ -28,8 +28,8 @@ def main():
     log_queue = mp.Queue()
     log_listener = start_logger_listener(log_queue)
 
-    cv_to_ocr_queue = mp.Queue(maxsize=100)
-    ocr_to_wsd_queue = mp.Queue(maxsize=100)
+    cv_to_ocr_queue = mp.Queue()
+    ocr_to_wsd_queue = mp.Queue()
 
     path_str = "sample/yfnu7-full/"
 

@@ -8,7 +8,7 @@ import signal
 import logging
 from manga2anki.util.logger import configure_worker_logging
 
-# Handle duplicates correctly
+# Seriously need to figure out how to turn off the logging progress bars
 
 def run_wsd_worker(
         input_queue: Queue, log_queue: Queue,

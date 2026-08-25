@@ -19,8 +19,7 @@ The first time you run the program it might take a few minutes to download
 the model weights from HuggingFace.
 
 ### Requirements
-- rhoknp
-- knp
+- jumanpp
 
 Make sure to install proper codecs to ensure file type support
 

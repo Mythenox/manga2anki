@@ -9,14 +9,11 @@ from manga2anki.util.logger import configure_worker_logging
 import logging
 import time
 
-# This is currently the bottleneck
-
 def run_cv_worker(
         image_paths_chunk: list[str],
         output_queue: Queue,
         log_queue: Queue
         ):
-    # cv2.setNumThreads(1)
     signal.signal(signal.SIGINT, signal.SIG_IGN)
 
     configure_worker_logging(log_queue)
@@ -24,6 +21,7 @@ def run_cv_worker(
 
     total_io_time = 0.0
     total_compute_time = 0.0
+    total_queue_time = 0.0
 
     for path in image_paths_chunk:
         t0 = time.time()
@@ -35,11 +33,20 @@ def run_cv_worker(
 
         t2 = time.time()
         
-        bubbles = get_bubbles(img)
+        bubbles: list[MatLike] = get_bubbles(img)
         t3 = time.time()
         total_compute_time += (t3 - t2)
-        for bubble in bubbles:
-            output_queue.put(bubble)
+
+        t4 = time.time()
+        output_queue.put(bubbles)
+        t5 = time.time()
+        total_queue_time += (t5 - t4)
         
 
-    logging.info(f"OpenCV worker finished. I/O Time: {total_io_time:.2f}s | Compute Time: {total_compute_time:.2f}s")
+    logging_result = (
+        f"OpenCV worker finished. I/O Time: {total_io_time:.2f}s "
+        f"| Compute Time: {total_compute_time:.2f}s "
+        f"| Queue Time: {total_queue_time:.2f}s"
+    )
+
+    logging.info(logging_result)
