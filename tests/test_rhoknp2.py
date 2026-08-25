@@ -1,9 +1,9 @@
-from rhoknp import Jumanpp, KNP
+from rhoknp import Jumanpp
 
-knp = KNP()
+jpp = Jumanpp()
 text = "わ〜い血だ〰♡"
 
-sentence = knp.apply_to_sentence(text)
+sentence = jpp.apply_to_sentence(text)
 
 """print("========== Clauses ==========")
 for clause in sentence.clauses:  # a.k.a., setsu

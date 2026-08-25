@@ -11,7 +11,11 @@ import time
 
 # This is currently the bottleneck
 
-def run_cv_worker(image_paths_chunk: list[str], output_queue: Queue, log_queue: Queue):
+def run_cv_worker(
+        image_paths_chunk: list[str],
+        output_queue: Queue,
+        log_queue: Queue
+        ):
     # cv2.setNumThreads(1)
     signal.signal(signal.SIGINT, signal.SIG_IGN)
 
@@ -32,9 +36,10 @@ def run_cv_worker(image_paths_chunk: list[str], output_queue: Queue, log_queue: 
         t2 = time.time()
         
         bubbles = get_bubbles(img)
-        for bubble in bubbles:
-            output_queue.put(bubble)
         t3 = time.time()
         total_compute_time += (t3 - t2)
+        for bubble in bubbles:
+            output_queue.put(bubble)
+        
 
     logging.info(f"OpenCV worker finished. I/O Time: {total_io_time:.2f}s | Compute Time: {total_compute_time:.2f}s")

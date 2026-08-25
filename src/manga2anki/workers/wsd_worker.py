@@ -3,21 +3,27 @@ import queue
 from manga2anki.models.word_sense import WSDEngine, MorphemeDatum
 from manga2anki.core.generate_deck import GeneratedDeck
 from manga2anki.core.create_cards import batch_create_kanji, batch_create_tango
-from rhoknp import KNP
+from rhoknp import Jumanpp
 import signal
 import logging
 from manga2anki.util.logger import configure_worker_logging
 
 # Handle duplicates correctly
 
-def run_wsd_worker(input_queue: Queue, log_queue: Queue, device: str, deck_name: str = "output", batch_size: int = 32, timeout_seconds: float = 2.0):
+def run_wsd_worker(
+        input_queue: Queue, log_queue: Queue,
+        device: str, 
+        deck_name: str = "output",
+        batch_size: int = 32, 
+        timeout_seconds: float = 2.0
+        ):
     signal.signal(signal.SIGINT, signal.SIG_IGN)
 
     configure_worker_logging(log_queue)
     logging.info(f"Starting WSD worker with a batch size of {batch_size}")
 
     wsd_engine = WSDEngine(device)
-    knp = KNP()
+    jpp = Jumanpp()
     batch_accumulator: list[str] = []
     deck = GeneratedDeck(deck_name)
     unique_morpheme_data: set[MorphemeDatum] = set()
@@ -33,7 +39,7 @@ def run_wsd_worker(input_queue: Queue, log_queue: Queue, device: str, deck_name:
                     morphemes = [
                         morpheme 
                         for text in batch_accumulator
-                        for morpheme in knp.apply_to_sentence(text).morphemes
+                        for morpheme in jpp.apply_to_sentence(text).morphemes
                     ]
                     final_output = batch_create_tango(morphemes, wsd_engine, unique_morpheme_data)
                     for tango in final_output:
@@ -49,7 +55,7 @@ def run_wsd_worker(input_queue: Queue, log_queue: Queue, device: str, deck_name:
                 morphemes = [
                     morpheme 
                     for text in batch_accumulator
-                    for morpheme in knp.apply_to_sentence(text).morphemes
+                    for morpheme in jpp.apply_to_sentence(text).morphemes
                 ]
                 output = batch_create_tango(morphemes, wsd_engine, unique_morpheme_data)
                 for tango in output:
@@ -64,7 +70,7 @@ def run_wsd_worker(input_queue: Queue, log_queue: Queue, device: str, deck_name:
                 morphemes = [
                     morpheme 
                     for text in batch_accumulator
-                    for morpheme in knp.apply_to_sentence(text).morphemes
+                    for morpheme in jpp.apply_to_sentence(text).morphemes
                 ]
                 output = batch_create_tango(morphemes, wsd_engine, unique_morpheme_data)
                 for tango in output:
