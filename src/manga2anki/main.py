@@ -45,10 +45,14 @@ def main():
 
     cv_processes = []
 
+    # assign unique worker id (just 0, 1, 2, 3) so cv workers can easily generate unique
+    # IDs for each image without collision (just prefix id with w0, w1, w2, or w3)
+    worker_id = 0
     for chunk in chunks:
-        p = mp.Process(target=run_cv_worker, args=(chunk.tolist(), cv_to_ocr_queue, log_queue))
+        p = mp.Process(target=run_cv_worker, args=(chunk.tolist(), cv_to_ocr_queue, log_queue, worker_id))
         p.start()
         cv_processes.append(p)
+        worker_id += 1
 
     ocr_proc = mp.Process(target=run_ocr_worker, args=(cv_to_ocr_queue, ocr_to_wsd_queue, log_queue, device))
     wsd_proc = mp.Process(target=run_wsd_worker, args=(ocr_to_wsd_queue, log_queue, device))

@@ -8,11 +8,17 @@ import signal
 from manga2anki.util.logger import configure_worker_logging
 import logging
 import time
+from typing import TypedDict
+
+class TaggedBubble(TypedDict):
+    id: str
+    img: MatLike
 
 def run_cv_worker(
         image_paths_chunk: list[str],
         output_queue: Queue,
-        log_queue: Queue
+        log_queue: Queue,
+        worker_id: int
         ):
     signal.signal(signal.SIGINT, signal.SIG_IGN)
 
@@ -38,7 +44,8 @@ def run_cv_worker(
         total_compute_time += (t3 - t2)
 
         t4 = time.time()
-        output_queue.put(bubbles)
+        tagged_bubbles: list[TaggedBubble] = [{"id": f"w{worker_id}i{i}", "img": bubble} for i, bubble in enumerate(bubbles)]
+        output_queue.put(tagged_bubbles)
         t5 = time.time()
         total_queue_time += (t5 - t4)
         
