@@ -1,19 +1,8 @@
-"""Process image to text, adding words as cards to an anki deck based on a filter
-(default will be N3+ or N4+?). Also add kanji only mode, where it will only add kanji.
-Add option to ask for user confirmation, where declined words will be remembered
-and ignored in the future. If supplied with a parent deck, words present in the parent
-deck will be ignored to avoid redundancy."""
-
-# TODO: add support for epub and mobi file types?
-# TODO: add support for only allowing JLPT vocab/kanji
-# TODO: add strict flag to not add vocab that do not have a jmdict definition
-# TODO: add  wanikani levels as well
-
 import time
 import torch.multiprocessing as mp
 from manga2anki.workers.cv_worker import run_cv_worker
-from manga2anki.workers.ocr_worker import run_ocr_worker
-from manga2anki.workers.wsd_worker import run_wsd_worker
+from manga2anki.workers.ocr_worker import run_manga_ocr_worker
+from manga2anki.workers.wsd_worker import run_wsd_worker, dummy_consumer
 from manga2anki.util.get_images import get_all_images
 import sys
 import numpy as np
@@ -47,20 +36,17 @@ def main():
 
     cv_processes = []
 
-    # assign unique worker id (just 0, 1, 2, 3) so cv workers can easily generate unique
-    # IDs for each image without collision (just prefix id with w0, w1, w2, or w3)
     for chunk in chunks:
         p = mp.Process(target=run_cv_worker, args=(chunk.tolist(), cv_to_ocr_queue, log_queue))
         p.start()
         cv_processes.append(p)
 
-    ocr_proc = mp.Process(target=run_ocr_worker, args=(cv_to_ocr_queue, ocr_to_wsd_queue, log_queue, device))
-    wsd_proc = mp.Process(target=run_wsd_worker, args=(ocr_to_wsd_queue, log_queue, device))
-
+    ocr_proc = mp.Process(target=run_manga_ocr_worker, args=(cv_to_ocr_queue, ocr_to_wsd_queue, log_queue, device))
+    dummy_proc = mp.Process(target=dummy_consumer, args=(ocr_to_wsd_queue,))
     ocr_proc.start()
-    wsd_proc.start()
+    dummy_proc.start()
 
-    all_processes = cv_processes + [ocr_proc, wsd_proc]
+    all_processes = cv_processes + [ocr_proc, dummy_proc]
 
     try:
         for p in cv_processes:
@@ -69,11 +55,13 @@ def main():
         cv_to_ocr_queue.put(None)
 
         ocr_proc.join()
-        wsd_proc.join()        
+        dummy_proc.join()
 
         duration = time.perf_counter() - start_time
         logging.info(f"Computed in {duration:.2f} seconds")
         log_listener.stop()
+
+        
     except KeyboardInterrupt:
         for p in all_processes:
             if p.is_alive():

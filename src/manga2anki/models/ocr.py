@@ -1,10 +1,6 @@
-from manga_ocr import MangaOcr
-from PIL import Image
-import transformers
 import torch
 from transformers import AutoImageProcessor, AutoTokenizer, VisionEncoderDecoderModel
-from manga2anki.workers.cv_worker import TaggedBubble
-from PIL import Image
+from PIL.Image import Image
 import re
 import jaconv
 
@@ -19,24 +15,22 @@ class OCREngine:
 
         self.image_processor = AutoImageProcessor.from_pretrained(model_name)
         self.tokenizer = AutoTokenizer.from_pretrained(model_name, tokenizer_type="bert-japanese")
-        self.model = VisionEncoderDecoderModel.from_pretrained(model_name).to(self.device) # type: ignore
+        self.model = VisionEncoderDecoderModel.from_pretrained(model_name).to(self.device).half() # type: ignore
 
         
-
-    def get_bubble_text(self, tagged_bubbles: list[TaggedBubble]) -> list[str]:
-        ids: list[str] = [tagged_bubble["id"] for tagged_bubble in tagged_bubbles]
-        images: list[Image.Image] = [
-            Image.fromarray(tagged_bubble["img"])
-            for tagged_bubble in tagged_bubbles
-        ]
-
+    """Returns a list of sentences/excerpts, each coming from a different speech bubble."""
+    def get_bubble_text(self, bubbles: list[Image]) -> list[str]:
         pixel_values = self.image_processor(
-            images,
+            bubbles,
             return_tensors="pt",
-        ).pixel_values.to(self.device)
+        ).pixel_values.to(self.device).half()
 
         with torch.no_grad():
-            generated_ids = self.model.generate(pixel_values, max_new_tokens=300) # type: ignore
+            generated_ids = self.model.generate( # type: ignore
+                pixel_values,
+                max_new_tokens=300,
+                max_length=None
+                ).cpu() 
 
         decoded_text: list[str] = self.tokenizer.batch_decode(generated_ids, skip_special_tokens=True)
 
@@ -44,29 +38,6 @@ class OCREngine:
 
         return post_processed_text
 
-    def get_text(self, tagged_bubbles: list[TaggedBubble]) -> list[str]:
-        ids: list[str] = [tagged_bubble["id"] for tagged_bubble in tagged_bubbles]
-        images: list[Image.Image] = [
-            Image.fromarray(tagged_bubble["img"])
-            for tagged_bubble in tagged_bubbles
-        ]
-
-        pixel_values = self.image_processor(
-            images,
-            return_tensors="pt",
-        ).pixel_values.to(self.device)
-
-        with torch.no_grad():
-            generated_ids = self.model.generate(pixel_values, max_new_tokens=300) # type: ignore
-
-        decoded_text: list[str] = self.tokenizer.batch_decode(generated_ids, skip_special_tokens=True)
-
-        post_processed_text = [post_process(text) for text in decoded_text]
-
-        return post_processed_text
-
-
-    
 
 def post_process(text: str):
     spaces_removed: str = "".join(text.split())

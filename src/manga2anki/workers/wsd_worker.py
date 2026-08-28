@@ -77,3 +77,11 @@ def run_wsd_worker(
                     deck.add_tango_note(tango)
 
                 batch_accumulator = []
+
+
+def dummy_consumer(q: Queue):
+    while True:
+        item = q.get()
+        if item is None:
+            break
+    
