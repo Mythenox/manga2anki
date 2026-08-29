@@ -1,7 +1,7 @@
 from rhoknp import Morpheme
 from manga2anki.core.vocab import Tango, Kanji
 from manga2anki.models.word_sense import WSDEngine, MorphemeDatum
-from manga2anki.util.constants import KANJI, JA_SYMBOLS
+from manga2anki.util.constants import KANJI, JA_CHARS
 import pandas as pd
 from manga2anki.util.inflect import eng_pos, lemmatize_surface, lemmatize_reading
 from jamdict import Jamdict
@@ -78,7 +78,7 @@ def batch_create_tango(
 
         bad_symbol_present = False
         for char in morpheme.surf:
-            if char not in JA_SYMBOLS:
+            if char not in JA_CHARS:
                 bad_symbol_present = True
                 break
         if bad_symbol_present:

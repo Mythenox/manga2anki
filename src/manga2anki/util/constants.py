@@ -1,12 +1,12 @@
 HIRAGANA: set[str] = {
     chr(code) 
-    for code in range(0x3040, 0x309F)
-    if code not in {0x3040, 0x3098, 0x3097}
+    for code in range(0x3041, 0x30A0)
+    if code not in {0x3098, 0x3097}
 }
 
 KATAKANA: set[str] = {
     chr(code)
-    for code in range(0x30A0, 0x30FF)
+    for code in range(0x30A0, 0x3100)
 }
 
 KATAKANA_TO_HIRAGANA: dict[str, str] = {
@@ -34,7 +34,7 @@ FILLER: set[str] = {
 
 KANJI: set[str] = {
     chr(code)
-    for code in range(0x4E00, 0x9FFF)
+    for code in range(0x4E00, 0xA000)
 }
 
-JA_SYMBOLS: set[str] = HIRAGANA | KATAKANA | KANJI
+JA_CHARS: set[str] = HIRAGANA | KATAKANA | KANJI
