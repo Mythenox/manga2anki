@@ -1,21 +1,20 @@
-from manga2anki.core.speech_bubble import get_bubbles
-import os
-import sys
-import cv2
-from cv2.typing import MatLike
 from torch.multiprocessing import Queue
 import signal
 from manga2anki.util.logger import configure_worker_logging
 import logging
 import time
-from PIL.Image import fromarray, Image
+from PIL import Image
+from manga2anki.models.bubble_detection import BubbleDetectionEngine
 
 def run_cv_worker(
         image_paths_chunk: list[str],
+        device: str,
         output_queue: Queue,
         log_queue: Queue,
         ):
     signal.signal(signal.SIGINT, signal.SIG_IGN)
+
+    detection_engine = BubbleDetectionEngine(device)
 
     configure_worker_logging(log_queue)
     logging.info(f"Starting OpenCV worker for {len(image_paths_chunk)} images")
@@ -26,7 +25,7 @@ def run_cv_worker(
 
     for path in image_paths_chunk:
         t0 = time.time()
-        img = cv2.imread(path)
+        img = Image.open(path).convert("RGB")
         t1 = time.time()
         if img is None:
             continue
@@ -34,13 +33,12 @@ def run_cv_worker(
 
         t2 = time.time()
         
-        bubbles: list[MatLike] = get_bubbles(img)
-        pil_bubbles: list[Image] = [fromarray(bubble) for bubble in bubbles]
+        bubbles: list[Image.Image] = detection_engine.detect_bubbles(img)
         t3 = time.time()
         total_compute_time += (t3 - t2)
 
         t4 = time.time()
-        output_queue.put(pil_bubbles)
+        output_queue.put(bubbles)
         t5 = time.time()
         total_queue_time += (t5 - t4)
         

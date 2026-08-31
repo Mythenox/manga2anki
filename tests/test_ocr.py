@@ -37,7 +37,7 @@ def main():
     cv_processes = []
 
     for chunk in chunks:
-        p = mp.Process(target=run_cv_worker, args=(chunk.tolist(), cv_to_ocr_queue, log_queue))
+        p = mp.Process(target=run_cv_worker, args=(chunk.tolist(), device, cv_to_ocr_queue, log_queue))
         p.start()
         cv_processes.append(p)
 
