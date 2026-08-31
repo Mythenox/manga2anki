@@ -11,6 +11,12 @@ import difflib
 # B: 思い出自多くもない
 # want to detect this kind of thing and heuristically keep only the longer output
 
+# compare similarity to kept_words set
+# use hashing somehow to avoid doing a million operations for each sentence
+# if no similar sentences, add word to set
+# if similar sentences, choose most similar one
+# replace sentence in kept_words with the longer of the two
+
 class OCREngine:
     def __init__(self, device: str, model_name: str = "kha-white/manga-ocr-base") -> None:
         if device != "cpu":
@@ -23,8 +29,8 @@ class OCREngine:
         self.model = VisionEncoderDecoderModel.from_pretrained(model_name).to(self.device).half() # type: ignore
 
         
-    """Returns a list of sentences/excerpts, each coming from a different speech bubble."""
     def get_bubble_text(self, bubbles: list[Image]) -> list[str]:
+        """Returns a list of sentences/excerpts, each coming from a different speech bubble."""
         pixel_values = self.image_processor(
             bubbles,
             return_tensors="pt",
@@ -48,6 +54,11 @@ class OCREngine:
         ]
 
         return filtered_text
+
+# only care about deletion and insertion.
+# if substitution is necessary, abort and return some kind of sentinel value like -1
+def edit_distance(str1: str, str2: str) -> int:
+    pass
 
 # remove stuff like "．．．", "(", "\"
 def is_garbage(sentence: str) -> bool:
