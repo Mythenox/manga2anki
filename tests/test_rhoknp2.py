@@ -1,7 +1,7 @@
 from rhoknp import Jumanpp
 
 jpp = Jumanpp()
-text = "走る"
+text = "どうかした"
 
 sentence = jpp.apply_to_sentence(text)
 

@@ -33,11 +33,32 @@ class TestLemmatize(unittest.TestCase):
         expected = "よぶ"
         self.assertEqual(actual, expected)
 
+    def test_deinflect5(self):
+        sentence = "聞いてよ"
+        morpheme = jpp.apply_to_sentence(sentence).morphemes[0]
+        actual = lemmatize_reading(morpheme)
+        expected = "きく"
+        self.assertEqual(actual, expected)
+
+    def test_deinflect6(self):
+        sentence = "出せる"
+        morpheme = jpp.apply_to_sentence(sentence).morphemes[0]
+        actual = lemmatize_reading(morpheme)
+        expected = "だす"
+        self.assertEqual(actual, expected)
+
     def test_irregular1(self):
         content = "来る"
         morpheme = jpp.apply_to_sentence(content).morphemes[0]
         actual = lemmatize_reading(morpheme) 
         expected = "くる"
+        self.assertEqual(actual, expected)
+
+    def test_irregular2(self):
+        sentence = "どうかした"
+        morpheme = jpp.apply_to_sentence(sentence).morphemes[-1]
+        actual = lemmatize_reading(morpheme)
+        expected = "する"
         self.assertEqual(actual, expected)
 
     def test_te_form1(self):

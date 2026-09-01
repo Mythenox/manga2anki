@@ -47,58 +47,21 @@ def lemmatize_reading_i_adj(morpheme: Morpheme) -> str:
         uninflected_part: str = morpheme.reading[:-1]
     return uninflected_part + "い"
 
-# inspect morpheme.semantics
-# for the case of 走れる, 可能動詞 appears as a key in the semantics dict
-# maybe the verb is in regular form iff semantics dict only has 1 key?
-
-def lemmatize_reading_verb(morpheme: Morpheme) -> str: 
-    # bugged for 聞いて? 
-    # also 学ぶ? 
-    # どうかした→どうかしたする?? 
-    # 出せる->だせる?? 
-    # 走れる -> はしれる?
-    # 呼ぶ -> よぶぶ?
-    # そそのかしてんの -> そそのかしてす?
-    """Returns reading of lemmatized form of verb.
-    Example: 刺さった -> ささる"""
-    uninflected_part: str = morpheme.reading
-
-    # for some reason morpheme.reading == 来る for 来る..?
-    if morpheme.lemma == "来る":
-        return "くる"
+def lemmatize_reading_verb(morpheme: Morpheme) -> str:
+    if morpheme.semantics is None:
+        return ""
     
-    dictionary_form_endings: list[str] = [
-        "う", "く", "ぐ", "す",
-        "つ", "ぬ", "ぶ", "む", "る",
-        ]
-    if morpheme.reading[-1] in dictionary_form_endings:
-        return morpheme.reading # in this case, the word must already be in dictionary form
+    lemmatized_form: str | bool = morpheme.semantics["代表表記"]
 
-    if morpheme.lemma in ["する", "くる"]:
-        return morpheme.lemma
-    if (
-        "未然形" in morpheme.conjform or
-        ("連用形" in morpheme.conjform and "子音動詞" in morpheme.conjtype) or
-        ("テ形" in morpheme.conjform and "母音動詞" in morpheme.conjtype) or
-        ("タ形" in morpheme.conjform and "母音動詞" in morpheme.conjtype)
-    ):
-        # stem will be of the form ~[か,ら,た,さ,ま,わ,な] (1) or ~[き,り,ち,し,み,い,に] (2)
-        # i.e. 行かない (1), 行きたい (2)
-        uninflected_part = morpheme.reading[:-1]
-        return uninflected_part + morpheme.lemma[-1]
+    # in this case, the real lemma is the value of the 可能動詞 key
+    # e.g. 出せる -> {..., "可能動詞": "出す/だす"}
+    if morpheme.semantics.get("可能動詞", None) is not None:
+        lemmatized_form: str | bool = morpheme.semantics["可能動詞"]
+    if isinstance(lemmatized_form, bool):
+            return ""
+    lemma_reading: str = lemmatized_form.split("/")[-1]
 
-    # want to, for example, extract the そろ from そろった
-    for i in range(len(morpheme.reading)):
-        if morpheme.reading[i] == "っ":
-            uninflected_part = morpheme.reading[:i]
-
-    # attach the okurigana from the lemma, i.e. the う from 揃う (そろう)
-    for i in range(len(morpheme.surf)):
-        if morpheme.surf[i] != morpheme.lemma[i]:
-            return uninflected_part + morpheme.lemma[i:]
-
-    # in this case, uninflected_part is a proper substring of the lemma, so it's just missing the last character
-    return uninflected_part + morpheme.lemma[-1]
+    return lemma_reading
 
 def eng_pos(morpheme: Morpheme) -> str:
     match morpheme.pos:
