@@ -47,12 +47,17 @@ def lemmatize_reading_i_adj(morpheme: Morpheme) -> str:
         uninflected_part: str = morpheme.reading[:-1]
     return uninflected_part + "い"
 
+# inspect morpheme.semantics
+# for the case of 走れる, 可能動詞 appears as a key in the semantics dict
+# maybe the verb is in regular form iff semantics dict only has 1 key?
+
 def lemmatize_reading_verb(morpheme: Morpheme) -> str: 
     # bugged for 聞いて? 
     # also 学ぶ? 
     # どうかした→どうかしたする?? 
     # 出せる->だせる?? 
     # 走れる -> はしれる?
+    # 呼ぶ -> よぶぶ?
     # そそのかしてんの -> そそのかしてす?
     """Returns reading of lemmatized form of verb.
     Example: 刺さった -> ささる"""
@@ -62,7 +67,10 @@ def lemmatize_reading_verb(morpheme: Morpheme) -> str:
     if morpheme.lemma == "来る":
         return "くる"
     
-    dictionary_form_endings: list[str] = ["う", "く", "す", "つ", "ぬ", "む", "る"]
+    dictionary_form_endings: list[str] = [
+        "う", "く", "ぐ", "す",
+        "つ", "ぬ", "ぶ", "む", "る",
+        ]
     if morpheme.reading[-1] in dictionary_form_endings:
         return morpheme.reading # in this case, the word must already be in dictionary form
 

@@ -1,7 +1,7 @@
 from rhoknp import Jumanpp
 
 jpp = Jumanpp()
-text = "わ〜い血だ〰♡"
+text = "走る"
 
 sentence = jpp.apply_to_sentence(text)
 
@@ -22,7 +22,7 @@ for morpheme in sentence.morphemes:
     print(morpheme)"""
 
 for morpheme in sentence.morphemes:
-    print(f"{morpheme}: {morpheme.lemma}, {morpheme.reading}, {morpheme.pos}")
+    print(f"{morpheme}: {morpheme.lemma}, {morpheme.reading}, {morpheme.pos}, {morpheme.semantics}")
     #canon = morpheme.semantics.get("代表表記")
     #if canon:
     #    print(morpheme.semantics.get("代表表記"))

@@ -1,5 +1,5 @@
 import unittest
-from src.manga2anki.core.batch_create import batch_create_kanji
+from src.manga2anki.core.create_cards import batch_create_kanji
 from src.manga2anki.core.vocab import Kanji
 from rhoknp import KNP
 
