@@ -29,7 +29,6 @@ def run_wsd_worker(
 
     wsd_engine = WSDEngine(device)
     jpp = Jumanpp()
-    batch_accumulator: list[str] = []
     deck = GeneratedDeck(deck_name)
     unique_morpheme_data: set[MorphemeDatum] = set()
 
@@ -37,32 +36,31 @@ def run_wsd_worker(
 
     while True:
         try:
-            
             item: list[str] | None = input_queue.get(timeout=timeout_seconds)
 
             if item is None:
                 if len(buffer) > 0:
-                    handle_batch(wsd_engine, buffer, unique_morpheme_data, deck, batch_size)
-                    logging.info("Generating .apkg...")
-                    deck.package_notes()
+                    deck = handle_batch(wsd_engine, buffer, unique_morpheme_data, deck, batch_size)
+                logging.info("Generating .apkg...")
+                deck.package_notes()
                 logging.info("WSD worker finished")
                 break
 
             morphemes = [
                 morpheme 
-                for text in batch_accumulator
-                for morpheme in jpp.apply_to_sentence(text).morphemes
+                for sentence in item
+                for morpheme in jpp.apply_to_sentence(sentence).morphemes
             ]
 
             buffer.extend(morphemes)
 
             if len(buffer) >= batch_size:
-                handle_batch(wsd_engine, buffer, unique_morpheme_data, deck, batch_size)
+                deck = handle_batch(wsd_engine, buffer, unique_morpheme_data, deck, batch_size)
 
         except queue.Empty:
             if len(buffer) > 0:
-                logging.info(f"Slow. Only received {len(batch_accumulator)} items in {timeout_seconds:.1f}s.")
-                handle_batch(wsd_engine, buffer, unique_morpheme_data, deck, batch_size)
+                logging.info(f"Slow. Only received {len(buffer)} items in {timeout_seconds:.1f}s.")
+                deck = handle_batch(wsd_engine, buffer, unique_morpheme_data, deck, batch_size)
 
 def handle_batch(
     wsd_engine: WSDEngine,
@@ -70,7 +68,7 @@ def handle_batch(
     unique_morpheme_data: set[MorphemeDatum],
     deck: GeneratedDeck,
     batch_size: int,
-    ) -> None:
+    ) -> GeneratedDeck:
     batch: list[Morpheme] = []
     while buffer:
         while buffer and len(batch) < batch_size:
@@ -81,6 +79,8 @@ def handle_batch(
             deck.add_tango_note(tango)
 
         batch = []
+
+    return deck
 
 
 def dummy_consumer(q: Queue):

@@ -61,12 +61,15 @@ def edit_distance(str1: str, str2: str) -> int:
     pass
 
 # remove stuff like "．．．", "(", "\"
+# strip punctuation before checking this
 def is_garbage(sentence: str) -> bool:
+    non_semantic_chars: set[str] = {"．", "！", "？", "。", "「", "」", "～"}
+    trimmed_sentence: str = "".join([char for char in sentence if char not in non_semantic_chars])
     # strings of 2 characters or less that have no kanji are almost always garbage
-    if len(sentence) <= 2 and all(char not in KANJI for char in sentence):
+    if len(trimmed_sentence) <= 2 and all(char not in KANJI for char in trimmed_sentence):
         return True
     # filters out strings that contain no japanese characters
-    if all(char not in JA_CHARS for char in sentence):
+    if all(char not in JA_CHARS for char in trimmed_sentence):
         return True
     return False
 

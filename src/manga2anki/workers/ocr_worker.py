@@ -1,15 +1,12 @@
 from torch.multiprocessing import Queue
 from manga2anki.models.ocr import OCREngine
-from cv2.typing import MatLike
 from PIL.Image import Image
 import signal
 import logging
 from logging import Logger
-from transformers.utils import logging as hf_logging
 from manga2anki.util.logger import configure_worker_logging
 import queue
 from collections import deque
-from manga_ocr import MangaOcr
 
 logging.getLogger("httpx").setLevel(logging.WARNING)
 logging.getLogger("httpcore").setLevel(logging.WARNING)

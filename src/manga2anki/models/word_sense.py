@@ -8,7 +8,9 @@ from typing import TypedDict
 from manga2anki.util.inflect import lemmatize_surface, lemmatize_reading
 from dataclasses import dataclass
 
-transformers.logging.disable_progress_bar()
+# TODO: figure out a way to group relevant sentences to provide more context for WSD.
+# Some sentences are far too short to correctly determine the best word sense.
+# Maybe use confidence score? 
 
 @dataclass
 class MorphemeDatum:
@@ -86,7 +88,8 @@ class WSDEngine:
         sense_embeddings = self.st_model.encode(
             unique_senses_list, 
             batch_size=32, 
-            convert_to_tensor=True
+            convert_to_tensor=True,
+            show_progress_bar=False,
         )
 
         results: list[SenseResult] = []

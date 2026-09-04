@@ -28,6 +28,7 @@ Make sure to install proper codecs to ensure file type support
 Available flags:
 - `-k` or `--kanji-mode` - Outputs an Anki deck for studying kanji instead of vocab
 - `-s` or `--strict-filter` - Filters out vocabulary/kanji that do not have a JLPT level
+- `-nb` or `--no-blanks` - Filters out vocabulary for which a word sense was not able to be determined (typically occurs for buggy output or words written in katakana that aren't usually written as such)
 - `-jf` or `--jlpt-floor` - Filters out vocab/kanji with a JLPT level below this number (1-5)
 - `-jc` or `--jlpt-ceiling` - Filters out vocab/kanji with a JLPT level above this number (1-5)
 

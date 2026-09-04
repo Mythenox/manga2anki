@@ -51,7 +51,11 @@ def lemmatize_reading_verb(morpheme: Morpheme) -> str:
     if morpheme.semantics is None:
         return ""
     
-    lemmatized_form: str | bool = morpheme.semantics["代表表記"]
+    try:
+        lemmatized_form: str | bool = morpheme.semantics["代表表記"]
+    except KeyError:
+        print(f"Error: the following morpheme does not have a 代表表記 key: {morpheme.surf}")
+        return ""
 
     # in this case, the real lemma is the value of the 可能動詞 key
     # e.g. 出せる -> {..., "可能動詞": "出す/だす"}
